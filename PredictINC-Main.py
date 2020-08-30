@@ -84,7 +84,7 @@ class MatplotlibWidget(QMainWindow):
             y = survey["Deviation"].values
 
             self.MplWidget.canvas.axes.clear()
-            self.MplWidget.canvas.axes.scatter(x, y, s=2)
+            self.MplWidget.canvas.axes.scatter(x, y, s=4, color="blue")
             #self.MplWidget.canvas.axes.legend(('cosinus', 'sinus'), loc='upper right')
             self.MplWidget.canvas.axes.set_title('Depth - Deviation')
             self.MplWidget.canvas.draw()
@@ -98,7 +98,7 @@ class MatplotlibWidget(QMainWindow):
         self.label_r2.setText("R2: " + str(round(r_sq, 2)))
 
         #self.MplWidget.canvas.axes.clear()
-        self.MplWidget.canvas.axes.plot(x, regressor.predict(x))
+        self.MplWidget.canvas.axes.plot(x, regressor.predict(x), c="purple")
         # self.MplWidget.canvas.axes.legend(('cosinus', 'sinus'), loc='upper right')
         #self.MplWidget.canvas.axes.set_title('Depth - Deviation')
         self.MplWidget.canvas.draw()
@@ -123,7 +123,7 @@ class MatplotlibWidget(QMainWindow):
         poly_r_sq = poly_model.score(x_, y)
         self.label_r2.setText("R2: " + str(round(poly_r_sq, 2)))
 
-        self.MplWidget.canvas.axes.plot(x_[:, 0], poly_model.predict(x_))
+        self.MplWidget.canvas.axes.plot(x_[:, 0], poly_model.predict(x_), c="orange")
         self.MplWidget.canvas.draw()
 
 
@@ -151,9 +151,6 @@ class MatplotlibWidget(QMainWindow):
             self.polynomial_regression_predict()
         else:
             self.label_deviation.setText('Please, select a prediction method')
-
-
-
 
 
 
