@@ -30,6 +30,7 @@ class MatplotlibWidget(QMainWindow):
         self.pushButton_poly.clicked.connect(self.polynomial_regression)
         self.pushButton_clear.clicked.connect(self.delete_graph)
         self.pushButton_predict.clicked.connect(self.predict)
+        self.label_r2.setText("R<sup>2</sup>=0")
 
         self.addToolBar(NavigationToolbar(self.MplWidget.canvas, self))
 
@@ -83,10 +84,13 @@ class MatplotlibWidget(QMainWindow):
             x = survey.Station.values.reshape((-1, 1))
             y = survey["Deviation"].values
 
+            self.label_deviation.setText('Deviation at  ' + str(survey["Station"].iloc[-1]) + ' m depth is ' + str(round(survey["Deviation"].iloc[-1], 2)) + ' m!')
+
             self.MplWidget.canvas.axes.clear()
-            self.MplWidget.canvas.axes.scatter(x, y, s=4, color="blue")
-            #self.MplWidget.canvas.axes.legend(('cosinus', 'sinus'), loc='upper right')
+            self.MplWidget.canvas.axes.scatter(x, y, s=4, color="blue", label="Deviation")
+            #self.MplWidget.canvas.axes.legend(["Deviation"], loc='best')
             self.MplWidget.canvas.axes.set_title('Depth - Deviation')
+            self.MplWidget.canvas.axes.legend()
             self.MplWidget.canvas.draw()
 
 
@@ -95,12 +99,15 @@ class MatplotlibWidget(QMainWindow):
         regressor = LinearRegression()
         regressor.fit(x, y)
         r_sq = regressor.score(x, y)
-        self.label_r2.setText("R2: " + str(round(r_sq, 2)))
+        self.label_r2.setText("R<sup>2</sup>= " + str(round(r_sq, 2)))
 
-        #self.MplWidget.canvas.axes.clear()
-        self.MplWidget.canvas.axes.plot(x, regressor.predict(x), c="purple")
-        # self.MplWidget.canvas.axes.legend(('cosinus', 'sinus'), loc='upper right')
+        self.MplWidget.canvas.axes.clear()
+        self.MplWidget.canvas.axes.scatter(x, y, s=4, color="blue", label="Deviation")
+        self.MplWidget.canvas.axes.set_title('Depth - Deviation')
+        self.MplWidget.canvas.axes.plot(x, regressor.predict(x), c="purple", label="Linear Regression")
+        #self.MplWidget.canvas.axes.legend(['Linear Regression', "Deviation" ], loc='best')
         #self.MplWidget.canvas.axes.set_title('Depth - Deviation')
+        self.MplWidget.canvas.axes.legend()
         self.MplWidget.canvas.draw()
 
 
@@ -110,7 +117,8 @@ class MatplotlibWidget(QMainWindow):
         depth_input = float(self.lineEdit_depth.text())
         depth = np.array([depth_input]).reshape(-1, 1)
         linear_y_pred = regressor.predict(depth)
-        self.label_deviation.setText('Deviation: ' + str(round(linear_y_pred[0], 2)) + ' m')
+        self.label_deviation.setText('Deviation at  ' + str(self.lineEdit_depth.text()) + ' m depth will (!) be ' + str(round(linear_y_pred[0], 2)) + ' m!')
+
 
 
 
@@ -121,9 +129,14 @@ class MatplotlibWidget(QMainWindow):
         x_ = transformer.transform(x)
         poly_model = LinearRegression().fit(x_, y)
         poly_r_sq = poly_model.score(x_, y)
-        self.label_r2.setText("R2: " + str(round(poly_r_sq, 2)))
+        self.label_r2.setText("R<sup>2</sup>= " + str(round(poly_r_sq, 2)))
 
-        self.MplWidget.canvas.axes.plot(x_[:, 0], poly_model.predict(x_), c="orange")
+        self.MplWidget.canvas.axes.clear()
+        self.MplWidget.canvas.axes.scatter(x, y, s=4, color="blue", label="Deviation")
+        self.MplWidget.canvas.axes.set_title('Depth - Deviation')
+        self.MplWidget.canvas.axes.plot(x_[:, 0], poly_model.predict(x_), c="orange", label="Polynomial Regression")
+        #self.MplWidget.canvas.axes.legend(['Polynomial Regression', 'Linear Regression', "Deviation"], loc='best')
+        self.MplWidget.canvas.axes.legend()
         self.MplWidget.canvas.draw()
 
 
@@ -135,7 +148,7 @@ class MatplotlibWidget(QMainWindow):
         depth_input = float(self.lineEdit_depth.text())
         depth = np.array([depth_input, depth_input**2]).reshape(1, 2)
         poly_y_pred = poly_model.predict(depth)
-        self.label_deviation.setText('Deviation: ' + str(round(poly_y_pred[0], 2)) + ' m')
+        self.label_deviation.setText('Deviation at  ' + str(self.lineEdit_depth.text()) + ' m depth will (!) be ' + str(round(poly_y_pred[0], 2)) + ' m!')
 
 
 
